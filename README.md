@@ -4,13 +4,13 @@
 
 This report is a hands-on technical guide for specializing the Qwen2.5-VL vision-language model. The goal is to create a powerful classifier for the EduGraph project, an initiative aimed at enabling "Smart Learning" by structuring the concepts of human learning into an open ontology. [1]
 
-The EduGraph system is designed to analyze diverse educational materials—including photos of worksheets, videos of learning sessions, and PDF documents—to track progress and generate personalized learning plans. [1] A general-purpose AI cannot reliably perform this task, as it requires deep, domain-specific knowledge and the ability to output data that conforms to a strict ontological structure.
+The EduGraph system is designed to analyze diverse educational materials—including photos of worksheets, videos of learning sessions, and PDF documents—to track progress and generate personalized learning plans. A general-purpose AI cannot reliably perform this task, as it requires deep, domain-specific knowledge and the ability to output data that conforms to a strict ontological structure.
 
-Qwen2.5-VL is the ideal foundation for this task due to its advanced capabilities in parsing complex documents, understanding long-form video, and generating structured JSON output natively. [2, 3] This blueprint provides a direct, action-oriented path to adapt Qwen2.5-VL for the EduGraph use case, focusing on efficient fine-tuning, practical data handling, and reliable, structured output generation.
+Qwen2.5-VL is the ideal foundation for this task due to its advanced capabilities in parsing complex documents, understanding long-form video, and generating structured JSON output natively. This blueprint provides a direct, action-oriented path to adapt Qwen2.5-VL for the EduGraph use case, focusing on efficient fine-tuning, practical data handling, and reliable, structured output generation.
 
------
+## Setup
 
-### Hardware and Environment Setup
+### Hardware Setup
 
 Before fine-tuning, a solid foundation is required. This involves selecting the right hardware and preparing the software environment.
 
@@ -21,14 +21,15 @@ The primary constraint for fine-tuning is GPU VRAM. Using memory-efficient techn
 | Metric | On-Premise: NVIDIA RTX 4090 | Cloud: NVIDIA A100 |
 | :--- | :--- | :--- |
 | **VRAM** | 24 GB | 80 GB |
-| **Feasibility** | Feasible for 7B models using QLoRA (4-bit quantization). [4, 5] | Comfortable for 7B models; allows for larger batch sizes and faster training. |
-| **Estimated Time** | \~12-24 hours per full training run. | \~4-8 hours per full training run. [6] |
-| **Estimated Cost** | High upfront hardware cost (\~$2,000), near-zero operational cost. | Zero upfront cost, operational cost of ~$1.30 - $2.40 per hour. [7, 8] |
-| **Best For** | **Prototyping and Development.** Ideal for experimentation and debugging where multiple runs are needed without incurring recurring costs. | **Production and Speed.** Best when time-to-market is critical or for final, large-scale training runs. |
+| **Feasibility** | Feasible for 7B models using QLoRA (4-bit quantization). | Comfortable for 7B models; allows for larger batch sizes and faster training. |
+| **Estimated Time** | \~12-24 hours per full training run. | \~4-8 hours per full training run. |
+| **Estimated Cost** | Near-zero operational cost. | Operational cost of ~$1.30 - $2.40 per hour. |
+
+Prototyping on an RTX 3060 or RTX 4060 is also feasible using QLoRA (4-bit quantization) using the 3B model.
 
 ### Environment and Dependencies
 
-Set up your Python environment and install the required libraries. It is highly recommended to install `transformers` from the source to ensure the latest Qwen2.5-VL updates are included. [9]bash
+Set up your Python environment and install the required libraries. It is highly recommended to install `transformers` from the source to ensure the latest Qwen2.5-VL updates are included.
 
 #### 1. Create and activate a virtual environment
 ```
@@ -146,8 +147,6 @@ def create_training_jsonl(raw_data, output_file):
 # ]
 # create_training_jsonl(my_dataset, "train_dataset.jsonl")
 ```
-
------
 
 ### Fine-Tuning Workflow
 
