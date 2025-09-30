@@ -142,9 +142,6 @@ def create_training_jsonl(raw_data, output_file):
             f.write(json.dumps(data_entry) + '\n')
 
 # --- Example Usage ---
-# my_dataset =, \"Scopes\": [\"Cellular\"], \"Abilities\": [\"Memorize\"]}}'),
-#     ("processed_data/lecture_frames/frame_300.jpg", '{\"error\": null, \"labels\": {\"Areas\": [\"Physics\"], \"Scopes\": [\"Mechanics\"], \"Abilities\": [\"Analyze\"]}}')
-# ]
 # create_training_jsonl(my_dataset, "train_dataset.jsonl")
 ```
 
