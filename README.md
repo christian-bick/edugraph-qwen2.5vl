@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This report is a hands-on technical guide for specializing the Qwen2.5-VL vision-language model. The goal is to create a powerful classifier for the EduGraph project, an initiative aimed at enabling "Smart Learning" by structuring the concepts of human learning into an open ontology. [1]
+This report is a hands-on technical guide for specializing the Qwen2.5-VL vision-language model. The goal is to create a powerful classifier for the EduGraph project, an initiative aimed at enabling "Smart Learning" by structuring the concepts of human learning into an open ontology.
 
 The EduGraph system is designed to analyze diverse educational materials—including photos of worksheets, videos of learning sessions, and PDF documents—to track progress and generate personalized learning plans. A general-purpose AI cannot reliably perform this task, as it requires deep, domain-specific knowledge and the ability to output data that conforms to a strict ontological structure.
 
@@ -101,7 +101,7 @@ def convert_pdf_to_images(pdf_path, output_folder):
 
 #### Structuring the Dataset for Training
 
-Fine-tuning requires a `jsonl` file where each line is a JSON object representing one training example. The data must be in a conversational format. [10, 11]
+Fine-tuning requires a `jsonl` file where each line is a JSON object representing one training example. The data must be in a conversational format.
 
 **Example `annotations.jsonl` entry:**
 
@@ -150,7 +150,7 @@ def create_training_jsonl(raw_data, output_file):
 
 ### Fine-Tuning Workflow
 
-This section provides the core code for fine-tuning the model. The primary strategy is **QLoRA (Quantized Low-Rank Adaptation)**, which makes training feasible on consumer hardware by only updating a small fraction of the model's parameters. [12, 13]
+This section provides the core code for fine-tuning the model. The primary strategy is **QLoRA (Quantized Low-Rank Adaptation)**, which makes training feasible on consumer hardware by only updating a small fraction of the model's parameters. 
 
 #### Loading the Model for QLoRA Training
 
@@ -198,7 +198,7 @@ model.print_trainable_parameters()
 
 #### Advanced Strategy 1: Two-Stage Fine-Tuning
 
-This method first teaches the model your ontology's terminology (Knowledge Infusion) and then teaches it the classification task (Task Tuning). [14]
+This method first teaches the model your ontology's terminology (Knowledge Infusion) and then teaches it the classification task (Task Tuning).
 
 **Stage 1: Knowledge Infusion**
 Create a text-only dataset of question-answer pairs from your ontology document. Fine-tune the model on this dataset and save the resulting adapter.
@@ -232,7 +232,7 @@ model_with_knowledge = PeftModel.from_pretrained(base_model, "path/to/your/knowl
 
 #### Advanced Strategy 2: Retrieval-Augmented Fine-Tuning (RAFT)
 
-RAFT teaches the model to perform classification in an "open-book" setting. For each training example, you provide the correct definition from your ontology (the "oracle") along with several incorrect ones ("distractors"). [15, 16, 17] This trains the model to identify and use relevant information while ignoring noise.
+RAFT teaches the model to perform classification in an "open-book" setting. For each training example, you provide the correct definition from your ontology (the "oracle") along with several incorrect ones ("distractors"). This trains the model to identify and use relevant information while ignoring noise.
 
 **Example RAFT Data Point:**
 
@@ -250,9 +250,9 @@ This requires a more complex data preparation pipeline but results in a model th
 
 ### Getting Reliable, Structured Output
 
-A fine-tuned model will not automatically produce perfect JSON. To guarantee the output conforms to your ontology's schema, you must use **constrained decoding**. This is done by manipulating the model's output probabilities (logits) at each step of generation. [18]
+A fine-tuned model will not automatically produce perfect JSON. To guarantee the output conforms to your ontology's schema, you must use **constrained decoding**. This is done by manipulating the model's output probabilities (logits) at each step of generation. 
 
-The best way to implement this is with a dedicated library like `outlines`, which can enforce a Pydantic schema or JSON schema directly. [19]
+The best way to implement this is with a dedicated library like `outlines`, which can enforce a Pydantic schema or JSON schema directly. 
 
 **Code Example: Constrained Generation with `outlines`**
 This is the recommended, production-ready approach.
