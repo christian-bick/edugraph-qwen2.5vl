@@ -7,6 +7,7 @@ from transformers import (
     BitsAndBytesConfig,
     TrainingArguments,
     Qwen2_5_VLForConditionalGeneration,
+    DataCollatorForLanguageModeling,
 )
 from peft import LoraConfig, get_peft_model
 from trl import SFTTrainer
@@ -19,8 +20,9 @@ def main():
 
     print("--- Starting Stage 1: Knowledge Infusion ---")
 
-    # Load processor
+    # Load processor and tokenizer
     processor = AutoProcessor.from_pretrained(base_model_id, trust_remote_code=True)
+    tokenizer = processor.tokenizer
 
     # Configure QLoRA
     bnb_config = BitsAndBytesConfig(
@@ -54,14 +56,20 @@ def main():
     dataset = load_dataset("json", data_files=text_dataset_path, split="train")
 
     def format_qa_dataset(examples):
-        # For text-only SFT, format the instruction-output pair
+        # This function now handles the entire formatting and tokenization process.
+        instructions = examples['instruction']
+        outputs = examples['output']
         texts = []
-        for i in range(len(examples['instruction'])):
-            text = f"<|im_start|>user\n{examples['instruction'][i]}<|im_end|>\n<|im_start|>assistant\n{examples['output'][i]}<|im_end|>"
+        for instruction, output in zip(instructions, outputs):
+            text = f"<|im_start|>user\n{instruction}<|im_end|>\n<|im_start|>assistant\n{output}<|im_end|>"
             texts.append(text)
-        return {"text": texts}
+        # Tokenize the formatted texts
+        return tokenizer(texts, truncation=True, padding="max_length", max_length=512)
 
-    processed_dataset = dataset.map(format_qa_dataset, batched=True)
+    processed_dataset = dataset.map(format_qa_dataset, batched=True, remove_columns=['instruction', 'output'])
+
+    # Instantiate a text-only data collator
+    data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
     # Set up TrainingArguments
     training_args = TrainingArguments(
@@ -81,7 +89,7 @@ def main():
         model=model,
         args=training_args,
         train_dataset=processed_dataset,
-        dataset_text_field="text",
+        data_collator=data_collator, # Use the text-only collator
     )
 
     # Train the knowledge adapter
