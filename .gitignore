@@ -18,3 +18,7 @@ __pycache__
 .env
 .env.bak
 *-credentials.json
+/qwen-env/
+
+#Data
+data
