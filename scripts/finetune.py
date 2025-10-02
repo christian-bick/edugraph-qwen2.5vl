@@ -1,15 +1,31 @@
+
 import os
 import torch
+from dataclasses import dataclass
+from typing import Any, Dict, List, Union
+
 from datasets import load_dataset
 from transformers import (
-    AutoModelForCausalLM,
     AutoProcessor,
     BitsAndBytesConfig,
     TrainingArguments,
-    Qwen2VLForConditionalGeneration,
+    Qwen2_5_VLForConditionalGeneration, # Use the specific class
 )
 from peft import LoraConfig, get_peft_model
 from trl import SFTTrainer
+
+# --- Custom Data Collator ---
+@dataclass
+class DataCollatorForQwenVL:
+    processor: AutoProcessor
+
+    def __call__(self, features: List[Dict[str, Any]]) -> Dict[str, torch.Tensor]:
+        texts = [feature["text"] for feature in features]
+        images = [feature["images"] for feature in features]
+        
+        batch = self.processor(text=texts, images=images, return_tensors="pt", padding=True)
+        batch["labels"] = batch["input_ids"].clone()
+        return batch
 
 def main():
     # --- Configuration ---
@@ -17,12 +33,12 @@ def main():
     multimodal_dataset_path = "train_dataset.jsonl"
     final_adapter_path = "./final_edugraph_adapter"
 
-    print("--- Starting Fine-Tuning (Final Pipeline) ---")
+    print("--- Starting Fine-Tuning (Corrected LoraConfig) ---")
 
     # Load processor
     processor = AutoProcessor.from_pretrained(base_model_id, trust_remote_code=True)
 
-    # Configure 4-bit quantization
+    # Configure QLoRA
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
@@ -30,21 +46,21 @@ def main():
         bnb_4bit_use_double_quant=True
     )
 
-    # Load base model using the correct specific class
-    model = Qwen2VLForConditionalGeneration.from_pretrained(
+    # Load base model
+    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         base_model_id,
         quantization_config=bnb_config,
         device_map="auto",
         trust_remote_code=True
     )
     
-    # Configure LoRA
+    # Configure the corrected LoRA
     lora_config = LoraConfig(
-        r=32,
-        lora_alpha=64,
-        lora_dropout=0.1,
+        r=8,
+        lora_alpha=16,
+        lora_dropout=0.05,
         bias="none",
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+        target_modules=["q_proj", "v_proj"], # The critical fix from the guide
         task_type="CAUSAL_LM"
     )
     model = get_peft_model(model, lora_config)
@@ -55,8 +71,6 @@ def main():
     dataset = dataset.rename_column("image", "images")
 
     def create_chat_template(examples):
-        # The SFTTrainer will handle tokenization. We just need to format the text part.
-        # The `image` column will be handled automatically by the trainer.
         prompts = []
         for i in range(len(examples['images'])):
             chat = [
@@ -67,7 +81,10 @@ def main():
             prompts.append(processor.apply_chat_template(chat, tokenize=False, add_generation_prompt=False))
         return {"text": prompts}
 
-    processed_dataset = dataset.map(create_chat_template, batched=True)
+    processed_dataset = dataset.map(create_chat_template, batched=True, remove_columns=["id", "conversations"])
+
+    # Instantiate the custom data collator
+    data_collator = DataCollatorForQwenVL(processor)
 
     # Set up TrainingArguments
     training_args = TrainingArguments(
@@ -79,7 +96,7 @@ def main():
         logging_steps=10,
         save_strategy="epoch",
         fp16=True,
-        remove_unused_columns=False, # Important for multimodal datasets
+        remove_unused_columns=False,
     )
 
     # Trainer for multimodal SFT
@@ -87,9 +104,7 @@ def main():
         model=model,
         args=training_args,
         train_dataset=processed_dataset,
-        # The trainer will automatically use the `image` and `text` columns
-
-        # The trainer will automatically use the `image` column and process it
+        data_collator=data_collator,
     )
 
     # Train the final adapter
