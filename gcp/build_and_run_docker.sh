@@ -8,14 +8,14 @@ ZONE="europe-west4-a"   # The zone for the Compute Engine VM
 # ---
 
 # Define names for the repository and image
-REPO_NAME="qwen-25vl-3B"
+REPO_NAME="qwen-25vl-3b"
 IMAGE_NAME="qwen-trainer"
 IMAGE_TAG="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$IMAGE_NAME:latest"
 
 # 1. Enable APIs (one-time setup)
-echo "--- Enabling required GCP APIs... ---"
-gcloud services enable artifactregistry.googleapis.com
-gcloud services enable containeranalysis.googleapis.com
+#echo "--- Enabling required GCP APIs... ---"
+#gcloud services enable artifactregistry.googleapis.com
+#gcloud services enable containeranalysis.googleapis.com
 
 # 2. Create Artifact Registry repository (if it doesn't exist)
 echo "--- Checking for Artifact Registry repository: $REPO_NAME ---"
