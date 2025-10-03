@@ -4,7 +4,7 @@
 resource "google_compute_instance" "instance-20251003-151201" {
   boot_disk {
     auto_delete = true
-    device_name = "instance-20251003-151201"
+    device_name = var.instance_name
 
     initialize_params {
       image = "projects/ml-images/global/images/c0-deeplearning-common-cu124-v20250325-debian-11-py310-conda"
@@ -35,7 +35,7 @@ resource "google_compute_instance" "instance-20251003-151201" {
     enable-osconfig = "TRUE"
   }
 
-  name = "instance-20251003-151201"
+  name = var.instance_name
 
   network_interface {
     access_config {
