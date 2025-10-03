@@ -21,5 +21,8 @@ __pycache__
 /qwen-env/
 
 #Data
-data
+/data
 /results_multimodal/
+/results_text_only/
+/knowledge_adapter/
+/final_edugraph_adapter/
