@@ -1,6 +1,7 @@
 # --- CONFIGURATION: PLEASE EDIT THESE VALUES ---
 PROJECT_ID="edugraph-438718"
 REGION="europe-west4" # The region for the Artifact Registry
+ZONE="europe-west4-a"   # The zone for the Compute Engine VM
 # ---
 
 # Define names for the repository and image
