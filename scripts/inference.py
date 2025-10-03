@@ -17,15 +17,16 @@ def main(args):
     print("--- Loading model and adapter for inference ---")
 
     # Load the processor
-    processor = AutoProcessor.from_pretrained(base_model_id, trust_remote_code=True)
+    processor = AutoProcessor.from_pretrained(base_model_id, trust_remote_code=True, local_files_only=True)
 
-    # Load the base model without quantization for best quality
+    # Load the base model without quantization
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         base_model_id,
         torch_dtype=torch.bfloat16,
         device_map="auto",
-        trust_remote_code=True
-    )
+        trust_remote_code=True,
+        local_files_only=True
+
 
     # Load the LoRA adapter and merge it into the base model
     model = PeftModel.from_pretrained(model, adapter_path)

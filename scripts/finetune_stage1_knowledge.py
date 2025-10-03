@@ -22,7 +22,7 @@ def main():
     print("--- Starting Stage 1: Knowledge Infusion ---")
 
     # Load processor and tokenizer
-    processor = AutoProcessor.from_pretrained(base_model_id, trust_remote_code=True)
+    processor = AutoProcessor.from_pretrained(base_model_id, trust_remote_code=True, local_files_only=True)
     tokenizer = processor.tokenizer
 
     # Configure QLoRA
@@ -38,7 +38,8 @@ def main():
         base_model_id,
         quantization_config=bnb_config,
         device_map="auto",
-        trust_remote_code=True
+        trust_remote_code=True,
+        local_files_only=True
     )
     
     # Configure LoRA

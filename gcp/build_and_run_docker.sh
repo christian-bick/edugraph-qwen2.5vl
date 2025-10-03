@@ -2,13 +2,13 @@
 set -e # Exit immediately if a command exits with a non-zero status.
 
 # --- CONFIGURATION: PLEASE EDIT THESE VALUES ---
-PROJECT_ID="your-gcp-project-id"
+PROJECT_ID="edugraph-438718"
 REGION="europe-west4" # The region for the Artifact Registry
 ZONE="europe-west4-a"   # The zone for the Compute Engine VM
 # ---
 
 # Define names for the repository and image
-REPO_NAME="qwen-training-repo"
+REPO_NAME="qwen-training"
 IMAGE_NAME="qwen-trainer"
 IMAGE_TAG="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$IMAGE_NAME:latest"
 

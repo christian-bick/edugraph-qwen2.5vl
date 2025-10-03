@@ -15,3 +15,5 @@ __pycache__/
 # The script will download/create these inside the container.
 data/
 out/
+gcp/
+ontology/
