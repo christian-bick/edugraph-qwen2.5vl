@@ -12,6 +12,13 @@ IMAGE_TAG="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$IMAGE_NAME:latest"
 # This uses a Container-Optimized OS and runs our container with a GPU attached.
 INSTANCE_NAME="qwen-training-vm-docker"
 echo "--- Creating VM and starting container... This can take several minutes. ---"
+
+# Debugging: Print all variables to ensure they are set
+echo "Instance Name: $INSTANCE_NAME"
+echo "Project ID: $PROJECT_ID"
+echo "Zone: $ZONE"
+echo "Image Tag: $IMAGE_TAG"
+
 gcloud compute instances create-with-container $INSTANCE_NAME \
     --project=$PROJECT_ID \
     --zone=$ZONE \
@@ -19,6 +26,7 @@ gcloud compute instances create-with-container $INSTANCE_NAME \
     --accelerator=type=nvidia-l4,count=1 \
     --image-family=cos-stable \
     --image-project=cos-cloud \
+    --boot-disk-size=100GB \
     --maintenance-policy=TERMINATE \
     --provisioning-model=SPOT \
     --scopes=cloud-platform \
