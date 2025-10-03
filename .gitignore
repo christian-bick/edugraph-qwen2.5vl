@@ -22,7 +22,4 @@ __pycache__
 
 #Data
 /data
-/results_multimodal/
-/results_text_only/
-/knowledge_adapter/
-/final_edugraph_adapter/
+/out

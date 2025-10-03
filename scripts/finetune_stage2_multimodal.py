@@ -30,8 +30,9 @@ def main():
     # --- Configuration ---
     base_model_id = "Qwen/Qwen2.5-VL-3B-Instruct"
     multimodal_dataset_path = "train_dataset.jsonl"
-    knowledge_adapter_path = "./knowledge_adapter" # Input from Stage 1
-    final_adapter_path = "./final_edugraph_adapter" # Final output
+    knowledge_adapter_path = "out/adapters/knowledge_adapter" # Input from Stage 1
+    final_adapter_path = "out/adapters/multimodal_adapter" # Final output
+    os.makedirs("out/adapters", exist_ok=True)
 
     print("--- Starting Stage 2: Multimodal Task Tuning ---")
 
@@ -94,7 +95,7 @@ def main():
 
     # Set up TrainingArguments
     training_args = TrainingArguments(
-        output_dir="./results_multimodal",
+        output_dir="out/results/multimodal_results",
         num_train_epochs=3,
         per_device_train_batch_size=1,
         gradient_accumulation_steps=8,

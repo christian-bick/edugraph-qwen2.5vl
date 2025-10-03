@@ -12,7 +12,7 @@ from peft import PeftModel
 def main(args):
     # --- Configuration ---
     base_model_id = "Qwen/Qwen2.5-VL-3B-Instruct"
-    adapter_path = "./final_edugraph_adapter"
+    adapter_path = "out/adapters/multimodal_adapter"
 
     print("--- Loading model and adapter for inference ---")
 

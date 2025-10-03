@@ -16,7 +16,8 @@ def main():
     # --- Configuration ---
     base_model_id = "Qwen/Qwen2.5-VL-3B-Instruct"
     text_dataset_path = "ontology_qa_v3.jsonl"
-    knowledge_adapter_path = "./knowledge_adapter"
+    knowledge_adapter_path = "out/adapters/knowledge_adapter"
+    os.makedirs("out/adapters", exist_ok=True)
 
     print("--- Starting Stage 1: Knowledge Infusion ---")
 
@@ -73,7 +74,7 @@ def main():
 
     # Set up TrainingArguments
     training_args = TrainingArguments(
-        output_dir="./results_text_only",
+        output_dir="out/results/knowledge_results",
         num_train_epochs=3,
         per_device_train_batch_size=2,
         gradient_accumulation_steps=4,
