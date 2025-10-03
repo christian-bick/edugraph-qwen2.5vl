@@ -1,22 +1,28 @@
 #!/bin/bash
 
-# This script uses gcloud to deploy the Terraform configuration.
+# This script creates the VM directly using gcloud compute.
 
-# Note: You may need to enable the Infrastructure Manager API the first time you run this:
-# gcloud services enable infra-manager.googleapis.com
+PROJECT_ID=$(grep -o 'project_id = ".*"' gcp/terraform.tfvars | cut -d '"' -f 2)
+INSTANCE_NAME="qwen-training-vm"
+ZONE="europe-west4-a"
 
-LOCATION="europe-west4"
-DEPLOYMENT_NAME="qwen-deployment"
+if [ -z "$PROJECT_ID" ]; then
+    echo "Error: project_id not found in gcp/terraform.tfvars"
+    exit 1
+fi
 
-echo "Deploying Terraform configuration using gcloud Infrastructure Manager..."
-echo "This may take a few minutes."
+echo "Creating VM instance: $INSTANCE_NAME..."
 
-# The command must be run from within the 'gcp' directory
-cd gcp
+gcloud compute instances create $INSTANCE_NAME \
+    --project=$PROJECT_ID \
+    --zone=$ZONE \
+    --machine-type=g2-standard-8 \
+    --accelerator=type=nvidia-l4,count=1 \
+    --image-family=pytorch-2-7-cu128-ubuntu-2204-nvidia-570 \
+    --image-project=deeplearning-platform-release \
+    --maintenance-policy=TERMINATE \
+    --provisioning-model=SPOT \
+    --scopes=cloud-platform \
+    --metadata=install-gpu-driver=True
 
-gcloud infra-manager deployments apply $DEPLOYMENT_NAME \
-    --location=$LOCATION \
-    --terraform-blueprint-from-local-path=. \
-    --inputs-file=terraform.tfvars
-
-echo "Deployment command sent. Check the GCP console for status."
+echo "VM creation command sent."

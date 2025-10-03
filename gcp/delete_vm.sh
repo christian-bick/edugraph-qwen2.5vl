@@ -1,15 +1,13 @@
 #!/bin/bash
 
-# This script uses gcloud to delete the Terraform deployment.
+INSTANCE_NAME="qwen-training-vm"
+ZONE="europe-west4-a"
 
-LOCATION="europe-west4"
-DEPLOYMENT_NAME="qwen-deployment"
-
-echo "This will permanently delete all resources managed by the '$DEPLOYMENT_NAME' deployment."
+echo "This will permanently delete the VM instance '$INSTANCE_NAME'."
 read -p "Are you sure? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-    echo "Deleting deployment: $DEPLOYMENT_NAME..."
-    gcloud infra-manager deployments delete $DEPLOYMENT_NAME --location=$LOCATION
+    echo "Deleting VM instance: $INSTANCE_NAME..."
+    gcloud compute instances delete $INSTANCE_NAME --zone=$ZONE
 fi
