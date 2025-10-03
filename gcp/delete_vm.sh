@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INSTANCE_NAME="qwen-training-vm"
+INSTANCE_NAME="qwen-training-vm-docker"
 ZONE="europe-west4-a"
 
 echo "This will permanently delete the VM instance '$INSTANCE_NAME'."
