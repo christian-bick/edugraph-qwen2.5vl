@@ -6,6 +6,10 @@
 echo "--- Installing AWS CLI ---"
 sudo apt-get update && sudo apt-get install -y awscli
 
+echo "--- Cloning Repo ---"
+git clone https://github.com/christian-bick/edugraph-qwen2.5vl.git
+cd edugraph-qwen2.5vl
+
 echo "--- Syncing data from S3 bucket: s3://imagine-content ---"
 # Create the data directory if it doesn't exist
 mkdir -p data
