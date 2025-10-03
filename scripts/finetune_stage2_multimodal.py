@@ -1,4 +1,3 @@
-
 import os
 import torch
 from dataclasses import dataclass
@@ -96,7 +95,7 @@ def main():
     # Set up TrainingArguments
     training_args = TrainingArguments(
         output_dir="./results_multimodal",
-        num_train_epochs=5,
+        num_train_epochs=3,
         per_device_train_batch_size=1,
         gradient_accumulation_steps=8,
         learning_rate=1e-4,
