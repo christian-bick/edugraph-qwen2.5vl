@@ -15,7 +15,7 @@ from trl import SFTTrainer
 def main():
     # --- Configuration ---
     base_model_id = "Qwen/Qwen2.5-VL-3B-Instruct"
-    text_dataset_path = "ontology_qa_v2.jsonl"
+    text_dataset_path = "ontology_qa_v3.jsonl"
     knowledge_adapter_path = "./knowledge_adapter"
 
     print("--- Starting Stage 1: Knowledge Infusion ---")
