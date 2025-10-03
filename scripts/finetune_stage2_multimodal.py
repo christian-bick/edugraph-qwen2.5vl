@@ -77,12 +77,16 @@ def main():
     dataset = load_dataset("json", data_files=multimodal_dataset_path, split="train")
     dataset = dataset.rename_column("image", "images")
 
+    # Load the detailed prompt from the file
+    with open("prompts/classification_v2.txt", "r") as f:
+        prompt_text = f.read()
+
     def create_chat_template(examples):
         prompts = []
         for i in range(len(examples['images'])):
             chat = [
                 {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": [{"type": "image"}, {"type": "text", "text": "Classify this learning material using the provided ontology."}]},
+                {"role": "user", "content": [{"type": "image"}, {"type": "text", "text": prompt_text}]},
                 {"role": "assistant", "content": examples['conversations'][i][1]['value']}
             ]
             prompts.append(processor.apply_chat_template(chat, tokenize=False, add_generation_prompt=False))
