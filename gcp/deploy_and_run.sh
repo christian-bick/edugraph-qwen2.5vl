@@ -26,7 +26,7 @@ gcloud compute instances create-with-container $INSTANCE_NAME \
     --accelerator=type=nvidia-l4,count=1 \
     --image-family=cos-stable \
     --image-project=cos-cloud \
-    --boot-disk-size=100GB \
+    --boot-disk-size=200GB \
     --maintenance-policy=TERMINATE \
     --provisioning-model=SPOT \
     --scopes=cloud-platform \
