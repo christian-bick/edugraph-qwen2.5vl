@@ -1,7 +1,7 @@
 #!/bin/bash
 
 INSTANCE_NAME="qwen-training-vm"
-ZONE="us-central1-a"
+ZONE="europe-west4"
 REMOTE_DIR="~/edugraph-qwen2.5vl"
 
 echo "Copying current project directory to $INSTANCE_NAME:$REMOTE_DIR..."

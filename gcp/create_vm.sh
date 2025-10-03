@@ -5,7 +5,7 @@
 # Note: You may need to enable the Infrastructure Manager API the first time you run this:
 # gcloud services enable infra-manager.googleapis.com
 
-LOCATION="us-central1"
+LOCATION="europe-west4"
 DEPLOYMENT_NAME="qwen-deployment"
 
 echo "Deploying Terraform configuration using gcloud Infrastructure Manager..."

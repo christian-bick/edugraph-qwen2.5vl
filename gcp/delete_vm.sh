@@ -2,7 +2,7 @@
 
 # This script uses gcloud to delete the Terraform deployment.
 
-LOCATION="us-central1"
+LOCATION="europe-west4"
 DEPLOYMENT_NAME="qwen-deployment"
 
 echo "This will permanently delete all resources managed by the '$DEPLOYMENT_NAME' deployment."

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 INSTANCE_NAME="qwen-training-vm"
-ZONE="us-central1-a"
+ZONE="europe-west4"
 
 echo "Connecting to $INSTANCE_NAME via SSH..."
 
