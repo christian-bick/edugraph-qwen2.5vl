@@ -1,0 +1,15 @@
+Classify the provided material in the following steps:
+
+1) Determine if the material is learning material and if not return '{ "Error": "NotLearningMaterial" }'
+2) Determine if the learning material covers the field of math and if not return the error '{ "Error": "NotMathMaterial" }'
+3) Determine if the learning material covers an area of math taught in kindergarten or elementary school and if not return '{ "Error": "AreaNotCovered" }'
+4) Classify the material only using terms from the EduGraph ontology:
+4.1) Identify at least one "Area" term and be both complete and concise
+4.2) Identify at least one "Ability" term and focus on high relevance
+4.3) Identify at least three "Scope" terms and try to be complete
+5) Clean up the classification results:
+5.1) Eliminate any duplicates
+5.2) Remove parent terms if children terms are part of the result
+6) Return the result using only one of the following response schemas:
+6.1) For errors: { "Error": "IdentifiedError>" }
+6.2) For classifications: { "Area": [...] ], "Scope": [...], "Ability": [...] }
