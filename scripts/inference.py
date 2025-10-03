@@ -35,10 +35,14 @@ def main(args):
     # --- Run Inference using model.generate() ---
     print(f"\n--- Running inference on {args.image_path} ---")
     
+    # Load the detailed prompt from the file
+    with open("prompts/classification_v2.txt", "r") as f:
+        prompt_text = f.read()
+
     # Create the conversational prompt
     conversation = [
-        {"role": "system", "content": "You are a helpful assistant."}, 
-        {"role": "user", "content": [{"type": "image"}, {"type": "text", "text": "Classify this learning material using the provided ontology."}]}
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": [{"type": "image"}, {"type": "text", "text": prompt_text}]},
     ]
     
     # Apply the chat template and prepare inputs
