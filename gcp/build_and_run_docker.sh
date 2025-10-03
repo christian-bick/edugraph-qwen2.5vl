@@ -8,7 +8,7 @@ ZONE="europe-west4-a"   # The zone for the Compute Engine VM
 # ---
 
 # Define names for the repository and image
-REPO_NAME="qwen-training"
+REPO_NAME="qwen-25vl-3B"
 IMAGE_NAME="qwen-trainer"
 IMAGE_TAG="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$IMAGE_NAME:latest"
 
