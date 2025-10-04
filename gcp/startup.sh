@@ -2,6 +2,11 @@
 # This script runs automatically on the VM's first boot as the root user.
 # It installs Docker, then pulls a Docker image and runs it with GPU support.
 
+# --- Install Google Cloud Ops Agent ---
+echo "Installing Google Cloud Ops Agent for GPU monitoring..."
+curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
+bash add-google-cloud-ops-agent-repo.sh --also-install
+
 # Set PYTHONUNBUFFERED to see logs in real-time
 export PYTHONUNBUFFERED=1
 
