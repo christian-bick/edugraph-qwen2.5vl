@@ -87,15 +87,19 @@ def main():
     )
 
     # Trainer for text-only SFT
+    print("Initializing SFTTrainer...")
     trainer = SFTTrainer(
         model=model,
         args=training_args,
         train_dataset=processed_dataset,
         data_collator=data_collator, # Use the text-only collator
     )
+    print("SFTTrainer initialized.")
 
     # Train the knowledge adapter
+    print("Starting training...")
     trainer.train()
+    print("Training finished.")
 
     # Save the final adapter
     print(f"Saving knowledge adapter to {knowledge_adapter_path}")
