@@ -10,18 +10,23 @@ from transformers import (
     Qwen2_5_VLForConditionalGeneration,
     DataCollatorForLanguageModeling,
 )
-from peft import LoraConfig, get_peft_model
+from peft import get_peft_model
 from trl import SFTTrainer
+from scripts.config import get_config
 
 def main():
     # Load environment variables from .env file for local development
     load_dotenv()
-    # --- Run Mode Configuration ---
-    run_mode = os.environ.get("RUN_MODE", "train")  # Default to "train"
 
-    # --- Base Configuration ---
-    model_size = os.environ.get("MODEL_SIZE", "3b").upper()
-    base_model_id = f"Qwen/Qwen2.5-VL-{model_size}-Instruct"
+    # --- Configuration ---
+    run_mode = os.environ.get("RUN_MODE", "train")
+    model_size = os.environ.get("MODEL_SIZE", "3b")
+    
+    # Get model and training configurations
+    model_config = get_config(model_size)
+    stage1_config = model_config.stage1
+    base_model_id = f"Qwen/Qwen2.5-VL-{model_size.upper()}-Instruct"
+    
     text_dataset_path = "ontology_qa_v3.jsonl"
     knowledge_adapter_path = "out/adapters/knowledge_adapter"
     os.makedirs("out/adapters", exist_ok=True)
@@ -29,12 +34,12 @@ def main():
     # --- Mode-specific Adjustments ---
     if run_mode == "test":
         print("--- Running in TEST mode ---")
-        num_train_epochs = 0.1  # Run for a fraction of an epoch
-        max_train_samples = 10   # Use only 10 samples
+        num_train_epochs = 0.1
+        max_train_samples = 10
     else:
         print("--- Running in TRAIN mode ---")
-        num_train_epochs = 3     # Original value
-        max_train_samples = None # Use the full dataset
+        num_train_epochs = stage1_config.num_train_epochs
+        max_train_samples = None
 
     print("--- Starting Stage 1: Knowledge Infusion ---")
 
@@ -59,16 +64,8 @@ def main():
         local_files_only=True
     )
     
-    # Configure LoRA
-    lora_config = LoraConfig(
-        r=8,
-        lora_alpha=16,
-        lora_dropout=0.05,
-        bias="none",
-        target_modules=["q_proj", "v_proj"], # Use the safe, restricted modules
-        task_type="CAUSAL_LM"
-    )
-    model = get_peft_model(model, lora_config)
+    # Configure LoRA using the centralized config
+    model = get_peft_model(model, stage1_config.lora_config)
     model.print_trainable_parameters()
 
     # Load and process the dataset
@@ -98,7 +95,7 @@ def main():
         num_train_epochs=num_train_epochs,
         per_device_train_batch_size=2,
         gradient_accumulation_steps=4,
-        learning_rate=2e-4,
+        learning_rate=stage1_config.learning_rate, # Use learning rate from config
         logging_steps=10,
         save_strategy="epoch",
         fp16=True,

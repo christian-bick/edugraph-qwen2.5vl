@@ -12,8 +12,9 @@ from transformers import (
     TrainingArguments,
     Qwen2_5_VLForConditionalGeneration,
 )
-from peft import LoraConfig, get_peft_model, PeftModel # Import PeftModel
+from peft import get_peft_model, PeftModel # Import PeftModel
 from trl import SFTTrainer
+from scripts.config import get_config
 
 # --- Custom Data Collator ---
 @dataclass
@@ -39,12 +40,16 @@ class DataCollatorForQwenVL:
 def main():
     # Load environment variables from .env file for local development
     load_dotenv()
-    # --- Run Mode Configuration ---
-    run_mode = os.environ.get("RUN_MODE", "train")  # Default to "train"
 
-    # --- Base Configuration ---
-    model_size = os.environ.get("MODEL_SIZE", "3b").upper()
-    base_model_id = f"Qwen/Qwen2.5-VL-{model_size}-Instruct"
+    # --- Configuration ---
+    run_mode = os.environ.get("RUN_MODE", "train")
+    model_size = os.environ.get("MODEL_SIZE", "3b")
+    
+    # Get model and training configurations
+    model_config = get_config(model_size)
+    stage2_config = model_config.stage2
+    base_model_id = f"Qwen/Qwen2.5-VL-{model_size.upper()}-Instruct"
+    
     multimodal_dataset_path = "train_dataset.jsonl"
     knowledge_adapter_path = "out/adapters/knowledge_adapter" # Input from Stage 1
     final_adapter_path = "out/adapters/multimodal_adapter" # Final output
@@ -53,12 +58,12 @@ def main():
     # --- Mode-specific Adjustments ---
     if run_mode == "test":
         print("--- Running in TEST mode ---")
-        num_train_epochs = 0.1  # Run for a fraction of an epoch
-        max_train_samples = 10   # Use only 10 samples
+        num_train_epochs = 0.1
+        max_train_samples = 10
     else:
         print("--- Running in TRAIN mode ---")
-        num_train_epochs = 3     # Original value
-        max_train_samples = None # Use the full dataset
+        num_train_epochs = stage2_config.num_train_epochs
+        max_train_samples = None
 
     print("--- Starting Stage 2: Multimodal Task Tuning ---")
 
@@ -92,15 +97,7 @@ def main():
         print("Proceeding with the base model for Stage 2.")
     
     # --- Configure a NEW LoRA adapter for the multimodal task ---
-    lora_config_multimodal = LoraConfig(
-        r=32,
-        lora_alpha=64,
-        lora_dropout=0.1,
-        bias="none",
-        target_modules=["q_proj", "v_proj"], # Use the safe, restricted modules
-        task_type="CAUSAL_LM"
-    )
-    model = get_peft_model(model, lora_config_multimodal)
+    model = get_peft_model(model, stage2_config.lora_config)
     print("Trainable parameters for Stage 2:")
     model.print_trainable_parameters()
 
@@ -136,7 +133,7 @@ def main():
         num_train_epochs=num_train_epochs,
         per_device_train_batch_size=1,
         gradient_accumulation_steps=8,
-        learning_rate=1e-4,
+        learning_rate=stage2_config.learning_rate, # Use learning rate from config
         logging_steps=10,
         save_strategy="epoch",
         fp16=True,
