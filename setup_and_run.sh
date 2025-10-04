@@ -1,6 +1,9 @@
 #!/bin/bash
 # This script is the main entrypoint inside the Docker container.
 
+# Set environment variable to prevent tokenizer parallelism issues
+export TOKENIZERS_PARALLELISM=false
+
 # 1. Sync Data from S3
 echo "--- Syncing data from S3 bucket: s3://imagine-content ---"
 mkdir -p data
