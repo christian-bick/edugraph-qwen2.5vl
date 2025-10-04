@@ -5,7 +5,9 @@
 export TOKENIZERS_PARALLELISM=false
 
 # --- GCS Bucket Configuration ---
-GCS_BUCKET="gs://imagine-ml/edugraph-qwen-25vl-3b/"
+# The MODEL_SIZE variable is passed from the `docker run` command. Default to "3b".
+MODEL_SIZE=${MODEL_SIZE:-3b}
+GCS_BUCKET="gs://imagine-ml/edugraph-qwen-25vl-${MODEL_SIZE}/"
 
 # --- Test GCS Upload Permission ---
 echo "--- Testing GCS upload permission ---"
@@ -51,4 +53,4 @@ echo "--- All training stages complete! ---"
 
 # --- Upload results to GCS ---
 echo "Uploading adapter models to GCS..."
-gsutil -m cp -r out/adapters gs://imagine-ml/edugraph-qwen-25vl-3b/
+gsutil -m cp -r out/adapters $GCS_BUCKET

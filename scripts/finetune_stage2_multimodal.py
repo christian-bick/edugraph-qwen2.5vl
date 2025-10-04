@@ -40,7 +40,8 @@ def main():
     run_mode = os.environ.get("RUN_MODE", "train")  # Default to "train"
 
     # --- Base Configuration ---
-    base_model_id = "Qwen/Qwen2.5-VL-3B-Instruct"
+    model_size = os.environ.get("MODEL_SIZE", "3b").upper()
+    base_model_id = f"Qwen/Qwen2.5-VL-{model_size}-Instruct"
     multimodal_dataset_path = "train_dataset.jsonl"
     knowledge_adapter_path = "out/adapters/knowledge_adapter" # Input from Stage 1
     final_adapter_path = "out/adapters/multimodal_adapter" # Final output

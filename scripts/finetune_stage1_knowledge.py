@@ -17,7 +17,8 @@ def main():
     run_mode = os.environ.get("RUN_MODE", "train")  # Default to "train"
 
     # --- Base Configuration ---
-    base_model_id = "Qwen/Qwen2.5-VL-3B-Instruct"
+    model_size = os.environ.get("MODEL_SIZE", "3b").upper()
+    base_model_id = f"Qwen/Qwen2.5-VL-{model_size}-Instruct"
     text_dataset_path = "ontology_qa_v3.jsonl"
     knowledge_adapter_path = "out/adapters/knowledge_adapter"
     os.makedirs("out/adapters", exist_ok=True)

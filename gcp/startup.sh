@@ -7,12 +7,11 @@ echo "Installing Google Cloud Ops Agent for GPU monitoring..."
 curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
 bash add-google-cloud-ops-agent-repo.sh --also-install
 
-# Set PYTHONUNBUFFERED to see logs in real-time
-export PYTHONUNBUFFERED=1
-
 # --- Configuration ---
+# The model size to use (e.g., "3b" or "7b")
+MODEL_SIZE="3b"
 # The full tag of the Docker image to run
-IMAGE_TAG="europe-west4-docker.pkg.dev/edugraph-438718/qwen-25vl-3b/qwen-trainer:latest"
+IMAGE_TAG="europe-west4-docker.pkg.dev/edugraph-438718/qwen-25vl-${MODEL_SIZE}/qwen-trainer:latest"
 # The region where the Artifact Registry is located
 REGION="europe-west4"
 
@@ -46,10 +45,10 @@ echo "Running Docker container with GPU support (skipping Stage 1)..."
 # The --gpus all flag is essential to expose the host's GPUs to the container.
 # The -e SKIP_KI=true flag tells the script inside the container to skip Stage 1.
 # The -e RUN_MODE=test flag runs the training in test mode (small dataset, few epochs).
-docker run --gpus all --rm -e RUN_MODE=test "$IMAGE_TAG"
-
-echo "--- Startup script finished ---"
+docker run --gpus all --rm -e RUN_MODE=test -e MODEL_SIZE=$MODEL_SIZE "$IMAGE_TAG"
 
 # --- Self-destruct ---
 echo "Training process finished. Shutting down the VM."
 sudo shutdown -h now
+
+echo "--- Startup script finished ---"

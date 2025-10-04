@@ -1,14 +1,19 @@
 #!/bin/bash
 set -e # Exit immediately if a command exits with a non-zero status.
 
-# --- CONFIGURATION: PLEASE EDIT THESE VALUES ---
-PROJECT_ID="edugraph-438718"
-REGION="europe-west4" # The region for the Artifact Registry
-ZONE="europe-west4-a"   # The zone for the Compute Engine VM
-# ---
+# --- Load Configuration from .env file ---
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+else
+    echo "Error: .env file not found."
+    exit 1
+fi
+
+# --- Configuration from environment ---
+# These variables are now loaded from the .env file.
 
 # Define names for the repository and image
-REPO_NAME="qwen-25vl-3b"
+REPO_NAME="${GCS_BUCKET_FOLDER_PREFIX}-${MODEL_SIZE}"
 IMAGE_NAME="qwen-trainer"
 IMAGE_TAG="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$IMAGE_NAME:latest"
 
@@ -30,7 +35,8 @@ gcloud auth configure-docker $REGION-docker.pkg.dev
 
 # 3. Build and Push the Docker image
 echo "--- Building the Docker image: $IMAGE_TAG ---"
-docker build -t $IMAGE_TAG .
+# Pass the MODEL_SIZE as a build-arg to the Dockerfile
+docker build --build-arg MODEL_SIZE=$MODEL_SIZE -t $IMAGE_TAG .
 
 echo "--- Pushing the Docker image to Artifact Registry... "
 docker push $IMAGE_TAG

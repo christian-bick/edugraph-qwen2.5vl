@@ -2,12 +2,22 @@
 
 # This script creates the VM directly using gcloud compute.
 
-PROJECT_ID=$(grep -o 'project_id = ".*"' gcp/terraform.tfvars | cut -d '"' -f 2)
+# --- Load Configuration from .env file ---
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+else
+    echo "Error: .env file not found."
+    exit 1
+fi
+
+# --- Configuration from environment ---
+# These variables are now loaded from the .env file
+# PROJECT_ID
+# ZONE
 INSTANCE_NAME="qwen-training-vm"
-ZONE="europe-west4-a"
 
 if [ -z "$PROJECT_ID" ]; then
-    echo "Error: project_id not found in gcp/terraform.tfvars"
+    echo "Error: PROJECT_ID not found in .env file"
     exit 1
 fi
 
@@ -26,7 +36,7 @@ gcloud compute instances create $INSTANCE_NAME \
     --maintenance-policy=TERMINATE \
     --provisioning-model=SPOT \
     --scopes=cloud-platform \
-    --metadata=install-gpu-driver=True,google-monitoring-enabled=true \
+    --metadata=install-gpu-driver=True,google-monitoring-enabled=true,MODEL_SIZE=${MODEL_SIZE},RUN_MODE=${RUN_MODE},SKIP_KI=${SKIP_KI},PROJECT_ID=${PROJECT_ID},REGION=${REGION},GCS_BUCKET_FOLDER_PREFIX=${GCS_BUCKET_FOLDER_PREFIX},GCS_BUCKET_NAME=${GCS_BUCKET_NAME} \
     --metadata-from-file=startup-script=gcp/startup.sh
 
 echo "VM creation command sent."
