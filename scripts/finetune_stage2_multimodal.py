@@ -93,7 +93,7 @@ def main():
             prompts.append(processor.apply_chat_template(chat, tokenize=False, add_generation_prompt=False))
         return {"text": prompts}
 
-    processed_dataset = dataset.map(create_chat_template, batched=True, remove_columns=["id", "conversations"])
+    processed_dataset = dataset.map(create_chat_template, batched=True, remove_columns=["id", "conversations"], num_proc=1)
 
     # Instantiate the custom data collator
     data_collator = DataCollatorForQwenVL(processor)

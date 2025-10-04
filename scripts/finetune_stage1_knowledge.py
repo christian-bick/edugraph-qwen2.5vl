@@ -68,7 +68,7 @@ def main():
         # Tokenize the formatted texts
         return tokenizer(texts, truncation=True, padding="max_length", max_length=512)
 
-    processed_dataset = dataset.map(format_qa_dataset, batched=True, remove_columns=['instruction', 'output'])
+    processed_dataset = dataset.map(format_qa_dataset, batched=True, remove_columns=['instruction', 'output'], num_proc=1)
 
     # Instantiate a text-only data collator
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
