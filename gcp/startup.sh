@@ -1,24 +1,41 @@
 #!/bin/bash
 # This script runs automatically on the VM's first boot as the root user.
+# It installs Docker, then pulls a Docker image and runs it with GPU support.
 
-# The full URL to your public Git repository
-REPO_URL="https://github.com/christian-bick/edugraph-qwen2.5vl.git"
+# --- Configuration ---
+# The full tag of the Docker image to run
+IMAGE_TAG="europe-west4-docker.pkg.dev/edugraph-438718/qwen-25vl-3b/qwen-trainer:latest"
+# The region where the Artifact Registry is located
+REGION="europe-west4"
 
-# Navigate to the root home directory
-cd /root/
+echo "--- Startup script started ---"
 
-# Clone the repository
-echo "Cloning public repository: $REPO_URL"
-export GIT_TERMINAL_PROMPT=0
-git clone $REPO_URL
+# --- Install Docker ---
+echo "Installing Docker..."
+# Check if Docker is already installed
+if ! command -v docker &> /dev/null
+then
+    # Install Docker using the official script
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sh get-docker.sh
+    # Add the current user to the docker group to run docker without sudo
+    # This is not strictly necessary for the root user, but it's good practice
+    usermod -aG docker $(whoami)
+else
+    echo "Docker is already installed."
+fi
 
-# Navigate into the repo
-REPO_NAME=$(basename $REPO_URL .git)
-cd $REPO_NAME
+# --- Authenticate with Artifact Registry ---
+echo "Authenticating with Google Artifact Registry..."
+gcloud auth configure-docker $REGION-docker.pkg.dev --quiet
 
-# Execute the main setup script
-echo "Starting main setup and training script as root..."
-chmod +x gcp/setup_and_run.sh
-bash gcp/setup_and_run.sh
+# --- Pull the Docker image ---
+echo "Pulling Docker image: $IMAGE_TAG"
+docker pull $IMAGE_TAG
 
-echo "Startup script finished."
+# --- Run the Docker container ---
+echo "Running Docker container with GPU support..."
+# The --gpus all flag is essential to expose the host's GPUs to the container.
+docker run --gpus all --rm "$IMAGE_TAG"
+
+echo "--- Startup script finished ---"
