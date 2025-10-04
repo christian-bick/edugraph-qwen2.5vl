@@ -23,6 +23,13 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Pre-download the model files. This layer is rebuilt only if the dependencies above change.
 RUN python3 -c "from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration; model_id = 'Qwen/Qwen2.5-VL-3B-Instruct'; print(f'Downloading files for {model_id}...'); AutoProcessor.from_pretrained(model_id, trust_remote_code=True); Qwen2_5_VLForConditionalGeneration.from_pretrained(model_id, trust_remote_code=True); print('Download complete.')"
 
+# --- Google Cloud SDK Layer ---
+# Install Google Cloud SDK for gsutil. This is its own layer for better caching.
+RUN apt-get update && apt-get install -y curl && \
+    curl -sSL https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=/usr/local && \
+    rm -rf /var/lib/apt/lists/*
+ENV PATH="/usr/local/google-cloud-sdk/bin:${PATH}"
+
 # --- Application Code Layer ---
 # Finally, copy the rest of your application code.
 # This is the layer that will be rebuilt most often, but it will be very fast.
