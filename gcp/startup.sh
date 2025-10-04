@@ -49,3 +49,7 @@ echo "Running Docker container with GPU support (skipping Stage 1)..."
 docker run --gpus all --rm -e RUN_MODE=test "$IMAGE_TAG"
 
 echo "--- Startup script finished ---"
+
+# --- Self-destruct ---
+echo "Training process finished. Shutting down the VM."
+sudo shutdown -h now
