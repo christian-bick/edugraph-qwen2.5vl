@@ -26,7 +26,7 @@ gcloud compute instances create $INSTANCE_NAME \
     --maintenance-policy=TERMINATE \
     --provisioning-model=SPOT \
     --scopes=cloud-platform \
-    --metadata=install-gpu-driver=True \
+    --metadata=install-gpu-driver=True,google-monitoring-enabled=true \
     --metadata-from-file=startup-script=gcp/startup.sh
 
 echo "VM creation command sent."
