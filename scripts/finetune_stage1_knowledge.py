@@ -1,6 +1,7 @@
 
 import os
 import torch
+from dotenv import load_dotenv
 from datasets import load_dataset
 from transformers import (
     AutoProcessor,
@@ -13,6 +14,8 @@ from peft import LoraConfig, get_peft_model
 from trl import SFTTrainer
 
 def main():
+    # Load environment variables from .env file for local development
+    load_dotenv()
     # --- Run Mode Configuration ---
     run_mode = os.environ.get("RUN_MODE", "train")  # Default to "train"
 

@@ -3,6 +3,7 @@ import torch
 from dataclasses import dataclass
 from typing import Any, Dict, List, Union
 from PIL import Image
+from dotenv import load_dotenv
 
 from datasets import load_dataset
 from transformers import (
@@ -36,6 +37,8 @@ class DataCollatorForQwenVL:
         return batch
 
 def main():
+    # Load environment variables from .env file for local development
+    load_dotenv()
     # --- Run Mode Configuration ---
     run_mode = os.environ.get("RUN_MODE", "train")  # Default to "train"
 

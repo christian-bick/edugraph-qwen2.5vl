@@ -7,13 +7,22 @@ echo "Installing Google Cloud Ops Agent for GPU monitoring..."
 curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
 bash add-google-cloud-ops-agent-repo.sh --also-install
 
-# --- Configuration ---
-# The model size to use (e.g., "3b" or "7b")
-MODEL_SIZE="3b"
-# The full tag of the Docker image to run
-IMAGE_TAG="europe-west4-docker.pkg.dev/edugraph-438718/qwen-25vl-${MODEL_SIZE}/qwen-trainer:latest"
-# The region where the Artifact Registry is located
-REGION="europe-west4"
+# --- Configuration from Metadata Server ---
+echo "--- Reading configuration from metadata server ---"
+METADATA_URL="http://metadata.google.internal/computeMetadata/v1/instance/attributes"
+METADATA_HEADER="Metadata-Flavor: Google"
+MODEL_SIZE=$(curl -s -H "$METADATA_HEADER" "$METADATA_URL/MODEL_SIZE")
+RUN_MODE=$(curl -s -H "$METADATA_HEADER" "$METADATA_URL/RUN_MODE")
+SKIP_KI=$(curl -s -H "$METADATA_HEADER" "$METADATA_URL/SKIP_KI")
+PROJECT_ID=$(curl -s -H "$METADATA_HEADER" "$METADATA_URL/PROJECT_ID")
+REGION=$(curl -s -H "$METADATA_HEADER" "$METADATA_URL/REGION")
+GCS_BUCKET_FOLDER_PREFIX=$(curl -s -H "$METADATA_HEADER" "$METADATA_URL/GCS_BUCKET_FOLDER_PREFIX")
+GCS_BUCKET_NAME=$(curl -s -H "$METADATA_HEADER" "$METADATA_URL/GCS_BUCKET_NAME")
+
+# Define names for the repository and image
+REPO_NAME="${GCS_BUCKET_FOLDER_PREFIX}-${MODEL_SIZE}"
+IMAGE_NAME="qwen-trainer"
+IMAGE_TAG="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$IMAGE_NAME:latest"
 
 echo "--- Startup script started ---"
 
@@ -41,11 +50,17 @@ echo "Pulling Docker image: $IMAGE_TAG"
 docker pull $IMAGE_TAG
 
 # --- Run the Docker container ---
-echo "Running Docker container with GPU support (skipping Stage 1)..."
-# The --gpus all flag is essential to expose the host's GPUs to the container.
-# The -e SKIP_KI=true flag tells the script inside the container to skip Stage 1.
-# The -e RUN_MODE=test flag runs the training in test mode (small dataset, few epochs).
-docker run --gpus all --rm -e RUN_MODE=test -e MODEL_SIZE=$MODEL_SIZE "$IMAGE_TAG"
+echo "Running Docker container with GPU support..."
+# Pass all configuration variables to the container as environment variables
+docker run --gpus all --rm \
+  -e MODEL_SIZE=$MODEL_SIZE \
+  -e RUN_MODE=$RUN_MODE \
+  -e SKIP_KI=$SKIP_KI \
+  -e PROJECT_ID=$PROJECT_ID \
+  -e REGION=$REGION \
+  -e GCS_BUCKET_FOLDER_PREFIX=$GCS_BUCKET_FOLDER_PREFIX \
+  -e GCS_BUCKET_NAME=$GCS_BUCKET_NAME \
+  "$IMAGE_TAG"
 
 # --- Self-destruct ---
 echo "Training process finished. Shutting down the VM."

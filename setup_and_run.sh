@@ -5,9 +5,11 @@
 export TOKENIZERS_PARALLELISM=false
 
 # --- GCS Bucket Configuration ---
-# The MODEL_SIZE variable is passed from the `docker run` command. Default to "3b".
+# These variables are passed from the `docker run` command.
 MODEL_SIZE=${MODEL_SIZE:-3b}
-GCS_BUCKET="gs://imagine-ml/edugraph-qwen-25vl-${MODEL_SIZE}/"
+GCS_BUCKET_NAME=${GCS_BUCKET_NAME:-imagine-ml}
+GCS_BUCKET_FOLDER_PREFIX=${GCS_BUCKET_FOLDER_PREFIX:-edugraph-qwen-25vl}
+GCS_BUCKET="gs://${GCS_BUCKET_NAME}/${GCS_BUCKET_FOLDER_PREFIX}-${MODEL_SIZE}/"
 
 # --- Test GCS Upload Permission ---
 echo "--- Testing GCS upload permission ---"
