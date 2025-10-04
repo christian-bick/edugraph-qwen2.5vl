@@ -2,6 +2,9 @@
 # This script runs automatically on the VM's first boot as the root user.
 # It installs Docker, then pulls a Docker image and runs it with GPU support.
 
+# Set PYTHONUNBUFFERED to see logs in real-time
+export PYTHONUNBUFFERED=1
+
 # --- Configuration ---
 # The full tag of the Docker image to run
 IMAGE_TAG="europe-west4-docker.pkg.dev/edugraph-438718/qwen-25vl-3b/qwen-trainer:latest"

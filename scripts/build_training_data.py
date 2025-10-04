@@ -29,18 +29,21 @@ def find_and_process_metadata(root_dir, output_jsonl_file):
                     print(f"  Skipping entry in {meta_path} due to missing 'questionImage' or 'labels' field.")
                     continue
 
-                # Construct the full, absolute path for the image
-                relative_image_path = entry['questionImage']
-                absolute_image_path = os.path.abspath(os.path.join(meta_dir, relative_image_path))
+                # Construct the path for the image relative to the project root
+                relative_image_path_from_meta = entry['questionImage']
+                image_path_relative_to_root = os.path.join(meta_dir, relative_image_path_from_meta)
 
-                if not os.path.exists(absolute_image_path):
-                    print(f"  Image not found: {absolute_image_path}")
+                # Normalize the path to use forward slashes for consistency across platforms
+                image_path_relative_to_root = image_path_relative_to_root.replace('\\', '/')
+
+                if not os.path.exists(image_path_relative_to_root):
+                    print(f"  Image not found: {image_path_relative_to_root}")
                     continue
 
                 # The 'labels' field is already a JSON object, so we just need to dump it to a string
                 label_str = json.dumps(entry['labels'])
 
-                master_dataset.append((absolute_image_path, label_str))
+                master_dataset.append((image_path_relative_to_root, label_str))
 
     if not master_dataset:
         print("No data found. The 'train_dataset.jsonl' file will not be created.")
