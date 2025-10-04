@@ -13,11 +13,24 @@ from peft import LoraConfig, get_peft_model
 from trl import SFTTrainer
 
 def main():
-    # --- Configuration ---
+    # --- Run Mode Configuration ---
+    run_mode = os.environ.get("RUN_MODE", "train")  # Default to "train"
+
+    # --- Base Configuration ---
     base_model_id = "Qwen/Qwen2.5-VL-3B-Instruct"
     text_dataset_path = "ontology_qa_v3.jsonl"
     knowledge_adapter_path = "out/adapters/knowledge_adapter"
     os.makedirs("out/adapters", exist_ok=True)
+
+    # --- Mode-specific Adjustments ---
+    if run_mode == "test":
+        print("--- Running in TEST mode ---")
+        num_train_epochs = 0.1  # Run for a fraction of an epoch
+        max_train_samples = 10   # Use only 10 samples
+    else:
+        print("--- Running in TRAIN mode ---")
+        num_train_epochs = 3     # Original value
+        max_train_samples = None # Use the full dataset
 
     print("--- Starting Stage 1: Knowledge Infusion ---")
 
@@ -56,6 +69,8 @@ def main():
 
     # Load and process the dataset
     dataset = load_dataset("json", data_files=text_dataset_path, split="train")
+    if max_train_samples:
+        dataset = dataset.select(range(max_train_samples))
 
     def format_qa_dataset(examples):
         # This function now handles the entire formatting and tokenization process.
@@ -76,7 +91,7 @@ def main():
     # Set up TrainingArguments
     training_args = TrainingArguments(
         output_dir="out/results/knowledge_results",
-        num_train_epochs=3,
+        num_train_epochs=num_train_epochs,
         per_device_train_batch_size=2,
         gradient_accumulation_steps=4,
         learning_rate=2e-4,

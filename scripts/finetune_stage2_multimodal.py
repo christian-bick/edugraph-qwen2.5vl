@@ -36,12 +36,25 @@ class DataCollatorForQwenVL:
         return batch
 
 def main():
-    # --- Configuration ---
+    # --- Run Mode Configuration ---
+    run_mode = os.environ.get("RUN_MODE", "train")  # Default to "train"
+
+    # --- Base Configuration ---
     base_model_id = "Qwen/Qwen2.5-VL-3B-Instruct"
     multimodal_dataset_path = "train_dataset.jsonl"
     knowledge_adapter_path = "out/adapters/knowledge_adapter" # Input from Stage 1
     final_adapter_path = "out/adapters/multimodal_adapter" # Final output
     os.makedirs("out/adapters", exist_ok=True)
+
+    # --- Mode-specific Adjustments ---
+    if run_mode == "test":
+        print("--- Running in TEST mode ---")
+        num_train_epochs = 0.1  # Run for a fraction of an epoch
+        max_train_samples = 10   # Use only 10 samples
+    else:
+        print("--- Running in TRAIN mode ---")
+        num_train_epochs = 3     # Original value
+        max_train_samples = None # Use the full dataset
 
     print("--- Starting Stage 2: Multimodal Task Tuning ---")
 
@@ -89,6 +102,8 @@ def main():
 
     # Load and process the dataset
     dataset = load_dataset("json", data_files=multimodal_dataset_path, split="train")
+    if max_train_samples:
+        dataset = dataset.select(range(max_train_samples))
     dataset = dataset.rename_column("image", "images")
 
     # Load the detailed prompt from the file
@@ -114,7 +129,7 @@ def main():
     # Set up TrainingArguments
     training_args = TrainingArguments(
         output_dir="out/results/multimodal_results",
-        num_train_epochs=3,
+        num_train_epochs=num_train_epochs,
         per_device_train_batch_size=1,
         gradient_accumulation_steps=8,
         learning_rate=1e-4,
