@@ -26,7 +26,7 @@ echo "--- GCS permission test passed. Proceeding with main script. ---"
 # 1. Sync Data from S3
 echo "--- Syncing data from S3 bucket: s3://imagine-content ---"
 mkdir -p data
-aws s3 sync s3://imagine-content ./data/ --no-sign-request
+aws s3 sync s3://imagine-content ./data/ --no-sign-request --no-progress
 
 # 2. Build the training dataset from the synced data
 echo "--- Building training dataset from synced data ---"
@@ -34,6 +34,9 @@ python3 scripts/build_training_data.py
 
 # 3. Run the training stages in order
 if [ "$SKIP_KI" != "true" ]; then
+    echo "--- Generating ontology QA dataset for Stage 1 ---"
+    python3 scripts/generate_ontology_qa_v3.py
+
     echo "--- Starting Stage 1: Knowledge Infusion ---"
     python3 scripts/finetune_stage1_knowledge.py
     echo "--- Stage 1 complete. ---"
