@@ -37,8 +37,9 @@ echo "Pulling Docker image: $IMAGE_TAG"
 docker pull $IMAGE_TAG
 
 # --- Run the Docker container ---
-echo "Running Docker container with GPU support..."
+echo "Running Docker container with GPU support (skipping Stage 1)..."
 # The --gpus all flag is essential to expose the host's GPUs to the container.
-docker run --gpus all --rm "$IMAGE_TAG"
+# The -e SKIP_KI=true flag tells the script inside the container to skip Stage 1.
+docker run --gpus all --rm -e SKIP_KI=true "$IMAGE_TAG"
 
 echo "--- Startup script finished ---"

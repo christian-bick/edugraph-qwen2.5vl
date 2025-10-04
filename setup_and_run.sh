@@ -10,10 +10,15 @@ mkdir -p data
 aws s3 sync s3://imagine-content ./data/ --no-sign-request
 
 # 2. Run the training stages in order
-echo "--- Starting Stage 1: Knowledge Infusion ---"
-python3 scripts/finetune_stage1_knowledge.py
+if [ "$SKIP_KI" != "true" ]; then
+    echo "--- Starting Stage 1: Knowledge Infusion ---"
+    python3 scripts/finetune_stage1_knowledge.py
+    echo "--- Stage 1 complete. ---"
+else
+    echo "--- Skipping Stage 1 (Knowledge Infusion) as requested. ---"
+fi
 
-echo "--- Stage 1 complete. Starting Stage 2: Multimodal Training ---"
+echo "--- Starting Stage 2: Multimodal Training ---"
 python3 scripts/finetune_stage2_multimodal.py
 
 echo "--- All training stages complete! ---"

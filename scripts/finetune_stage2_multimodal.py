@@ -2,6 +2,7 @@ import os
 import torch
 from dataclasses import dataclass
 from typing import Any, Dict, List, Union
+from PIL import Image
 
 from datasets import load_dataset
 from transformers import (
@@ -20,7 +21,15 @@ class DataCollatorForQwenVL:
 
     def __call__(self, features: List[Dict[str, Any]]) -> Dict[str, torch.Tensor]:
         texts = [feature["text"] for feature in features]
-        images = [feature["images"] for feature in features]
+        
+        # Explicitly load images from file paths
+        image_paths = [feature["images"] for feature in features]
+        try:
+            images = [Image.open(path) for path in image_paths]
+        except Exception as e:
+            print(f"Error loading image paths: {image_paths}")
+            print(f"Error: {e}")
+            raise e
         
         batch = self.processor(text=texts, images=images, return_tensors="pt", padding=True)
         batch["labels"] = batch["input_ids"].clone()
@@ -56,10 +65,14 @@ def main():
         local_files_only=True
     )
 
-    # --- Load the knowledge adapter from Stage 1 ---
-    print(f"Loading knowledge adapter from {knowledge_adapter_path}...")
-    model = PeftModel.from_pretrained(model, knowledge_adapter_path)
-    print("Knowledge adapter loaded successfully.")
+    # --- Load the knowledge adapter from Stage 1 (if it exists) ---
+    if os.path.exists(knowledge_adapter_path):
+        print(f"Loading knowledge adapter from {knowledge_adapter_path}...")
+        model = PeftModel.from_pretrained(model, knowledge_adapter_path)
+        print("Knowledge adapter loaded successfully.")
+    else:
+        print(f"Knowledge adapter not found at {knowledge_adapter_path}. Skipping.")
+        print("Proceeding with the base model for Stage 2.")
     
     # --- Configure a NEW LoRA adapter for the multimodal task ---
     lora_config_multimodal = LoraConfig(
