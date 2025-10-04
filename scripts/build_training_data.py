@@ -56,8 +56,9 @@ def find_and_process_metadata(root_dir, output_jsonl_file):
     print("Done.")
 
 if __name__ == '__main__':
-    # Define the root directory for worksheets and the output file name
-    worksheets_root = os.path.join('data', 'worksheets')
+    # Define the root directory for the data and the output file name
+    # The data is synced from S3 directly into the 'data' directory.
+    data_root = 'data'
     output_file = 'train_dataset.jsonl'
     
-    find_and_process_metadata(worksheets_root, output_file)
+    find_and_process_metadata(data_root, output_file)
