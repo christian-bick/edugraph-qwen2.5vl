@@ -11,7 +11,10 @@ if [ -z "$PROJECT_ID" ]; then
     exit 1
 fi
 
-echo "Creating VM instance: $INSTANCE_NAME..."
+echo "--- Deleting existing VM instance (if any) ---"
+gcloud compute instances delete $INSTANCE_NAME --zone=$ZONE --quiet
+
+echo "--- Creating new VM instance: $INSTANCE_NAME... ---"
 
 gcloud compute instances create $INSTANCE_NAME \
     --project=$PROJECT_ID \
