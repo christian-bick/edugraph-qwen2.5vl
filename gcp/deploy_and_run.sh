@@ -30,6 +30,7 @@ gcloud compute instances create-with-container $INSTANCE_NAME \
     --maintenance-policy=TERMINATE \
     --provisioning-model=SPOT \
     --scopes=cloud-platform \
+    --metadata=install-gpu-driver=True \
     --container-image=$IMAGE_TAG
 
 echo "\n--- Deployment started! ---"

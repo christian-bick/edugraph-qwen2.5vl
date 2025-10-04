@@ -51,7 +51,7 @@ def main():
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         base_model_id,
         quantization_config=bnb_config,
-        device_map="auto",
+        device_map={"": 0},
         trust_remote_code=True,
         local_files_only=True
     )
