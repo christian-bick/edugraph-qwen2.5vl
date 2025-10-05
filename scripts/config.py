@@ -57,14 +57,13 @@ config_7b = ModelConfig(
         r=16,
         lora_alpha=32,
         lora_dropout=0.1,
-        learning_rate=1e-4,
-        num_train_epochs=6
+        num_train_epochs=8
     ),
     stage2=Stage2Config(
         r=64, # Increased rank for stage 2 on the 7B model
         lora_alpha=128,
         lora_dropout=0.1,
-        learning_rate=5e-5, # Lower learning rate for the larger model in stage 2
+        learning_rate=2e-4, # Increased learning rate to address poor performance
         num_train_epochs=4
     )
 )
