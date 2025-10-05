@@ -30,7 +30,7 @@ echo "--- GCS permission test passed. Proceeding with main script. ---"
 # 1. Sync Data from S3
 echo "--- Syncing data from S3 bucket: s3://imagine-content ---"
 mkdir -p data
-aws s3 sync s3://imagine-content ./data/ --no-sign-request --no-progress
+aws s3 sync s3://imagine-content ./data/ --no-sign-request --no-progress --quiet
 
 # 2. Build the training dataset from the synced data
 echo "--- Building training dataset from synced data ---"
