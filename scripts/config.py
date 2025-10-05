@@ -40,14 +40,14 @@ config_3b = ModelConfig(
         lora_alpha=16,
         lora_dropout=0.05,
         learning_rate=2e-4,
-        num_train_epochs=3
+        num_train_epochs=6
     ),
     stage2=Stage2Config(
         r=32,
         lora_alpha=64,
         lora_dropout=0.1,
         learning_rate=1e-4,
-        num_train_epochs=3
+        num_train_epochs=4
     )
 )
 
@@ -58,14 +58,14 @@ config_7b = ModelConfig(
         lora_alpha=32,
         lora_dropout=0.1,
         learning_rate=1e-4,
-        num_train_epochs=3
+        num_train_epochs=6
     ),
     stage2=Stage2Config(
         r=64, # Increased rank for stage 2 on the 7B model
         lora_alpha=128,
         lora_dropout=0.1,
         learning_rate=5e-5, # Lower learning rate for the larger model in stage 2
-        num_train_epochs=3
+        num_train_epochs=4
     )
 )
 
