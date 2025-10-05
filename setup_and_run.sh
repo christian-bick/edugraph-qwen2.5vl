@@ -4,6 +4,9 @@
 # Set environment variable to prevent tokenizer parallelism issues
 export TOKENIZERS_PARALLELISM=false
 
+# Add the project root to the PYTHONPATH to allow for absolute imports
+export PYTHONPATH=.
+
 # --- GCS Bucket Configuration ---
 # These variables are passed from the `docker run` command.
 MODEL_SIZE=${MODEL_SIZE:-3b}
