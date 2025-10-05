@@ -17,15 +17,15 @@ def main(args):
     print("--- Loading model and adapter for inference ---")
 
     # Load the processor
-    processor = AutoProcessor.from_pretrained(base_model_id, trust_remote_code=True, local_files_only=True)
+    processor = AutoProcessor.from_pretrained(base_model_id, trust_remote_code=True)
 
     # Load the base model without quantization
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         base_model_id,
         torch_dtype=torch.bfloat16,
         device_map="auto",
-        trust_remote_code=True,
-        local_files_only=True
+        trust_remote_code=True
+    )
 
 
     # Load the LoRA adapter and merge it into the base model
@@ -66,6 +66,6 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run inference with the fine-tuned EduGraph model.")
-    parser.add_argument("--image_path", type=str, required=True, help="Path to the image file to classify.")
+    parser.add_argument("image_path", type=str, help="Path to the image file to classify.")
     args = parser.parse_args()
     main(args)
