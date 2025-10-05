@@ -57,6 +57,7 @@ config_7b = ModelConfig(
         r=16,
         lora_alpha=32,
         lora_dropout=0.1,
+        learning_rate=1e-4,
         num_train_epochs=8
     ),
     stage2=Stage2Config(
