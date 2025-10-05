@@ -68,7 +68,7 @@ def main():
     print("--- Starting Stage 2: Multimodal Task Tuning ---")
 
     # Load processor
-    processor = AutoProcessor.from_pretrained(base_model_id, trust_remote_code=True, local_files_only=True)
+    processor = AutoProcessor.from_pretrained(base_model_id, trust_remote_code=True)
 
     # Configure QLoRA
     bnb_config = BitsAndBytesConfig(
@@ -83,8 +83,7 @@ def main():
         base_model_id,
         quantization_config=bnb_config,
         device_map={"": 0},
-        trust_remote_code=True,
-        local_files_only=True
+        trust_remote_code=True
     )
 
     # --- Load the knowledge adapter from Stage 1 (if it exists) ---

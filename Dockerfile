@@ -25,7 +25,7 @@ ARG MODEL_SIZE=3b
 # Set it as an environment variable to be used in the RUN command
 ENV MODEL_SIZE=$MODEL_SIZE
 # Pre-download the model files. This layer is rebuilt only if the dependencies above change.
-RUN python3 -c "from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration; import os; model_size = os.environ.get('MODEL_SIZE', '3b').upper(); model_id = f'Qwen/Qwen2.5-VL-{model_size}-Instruct'; print(f'Downloading files for {model_id}...'); AutoProcessor.from_pretrained(model_id, trust_remote_code=True); Qwen2_5_VLForConditionalGeneration.from_pretrained(model_id, trust_remote_code=True); print('Download complete.')"
+# RUN python3 -c "from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration; import os; model_size = os.environ.get('MODEL_SIZE', '3b').upper(); model_id = f'Qwen/Qwen2.5-VL-{model_size}-Instruct'; print(f'Downloading files for {model_id}...'); AutoProcessor.from_pretrained(model_id, trust_remote_code=True); Qwen2_5_VLForConditionalGeneration.from_pretrained(model_id, trust_remote_code=True); print('Download complete.')"
 
 # --- Google Cloud SDK Layer ---
 # Install Google Cloud SDK for gsutil. This is its own layer for better caching.
