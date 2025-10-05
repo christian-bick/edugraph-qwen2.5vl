@@ -88,9 +88,10 @@ def main():
 
     # --- Load the knowledge adapter from Stage 1 (if it exists) ---
     if os.path.exists(knowledge_adapter_path):
-        print(f"Loading knowledge adapter from {knowledge_adapter_path}...")
+        print(f"Loading and merging knowledge adapter from {knowledge_adapter_path}...")
         model = PeftModel.from_pretrained(model, knowledge_adapter_path)
-        print("Knowledge adapter loaded successfully.")
+        model = model.merge_and_unload()
+        print("Knowledge adapter loaded and merged successfully.")
     else:
         print(f"Knowledge adapter not found at {knowledge_adapter_path}. Skipping.")
         print("Proceeding with the base model for Stage 2.")
