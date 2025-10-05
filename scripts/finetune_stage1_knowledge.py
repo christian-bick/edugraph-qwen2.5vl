@@ -59,7 +59,7 @@ def main():
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         base_model_id,
         quantization_config=bnb_config,
-        device_map={"": 0},
+        device_map="auto",
         trust_remote_code=True
     )
     
