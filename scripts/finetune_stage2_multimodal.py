@@ -115,8 +115,8 @@ def main():
         prompts = []
         for i in range(len(examples['images'])):
             chat = [
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": [{"type": "image"}, {"type": "text", "text": prompt_text}]},
+                {"role": "system", "content": prompt_text},
+                {"role": "user", "content": [{"type": "image"}]},
                 {"role": "assistant", "content": examples['conversations'][i][1]['value']}
             ]
             prompts.append(processor.apply_chat_template(chat, tokenize=False, add_generation_prompt=False))
