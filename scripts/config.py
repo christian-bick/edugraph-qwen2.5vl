@@ -20,7 +20,7 @@ class Stage2Config:
             lora_alpha=lora_alpha,
             lora_dropout=lora_dropout,
             bias="none",
-            target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+            target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
             task_type="CAUSAL_LM"
         )
         self.learning_rate = learning_rate
@@ -61,8 +61,8 @@ config_7b = ModelConfig(
         num_train_epochs=8
     ),
     stage2=Stage2Config(
-        r=64, # Increased rank for stage 2 on the 7B model
-        lora_alpha=128,
+        r=32, # Reduced rank to fit in memory
+        lora_alpha=64,
         lora_dropout=0.1,
         learning_rate=1e-4, # Adjusted learning rate to balance stability
         num_train_epochs=4
