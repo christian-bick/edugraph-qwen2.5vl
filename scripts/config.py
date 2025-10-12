@@ -13,14 +13,7 @@ class Stage1Config:
         self.learning_rate = learning_rate
         self.num_train_epochs = num_train_epochs
 
-class Stage2Config:
-    def __init__(self, r, lora_alpha, lora_dropout, learning_rate, num_train_epochs):
-        self.lora_config = LoraConfig(
-            r=r,
-            lora_alpha=lora_alpha,
-            lora_dropout=lora_dropout,
-            bias="none",
-            target_modules=["q_proj", "v_proj"],
+            target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
             task_type="CAUSAL_LM"
         )
         self.learning_rate = learning_rate
