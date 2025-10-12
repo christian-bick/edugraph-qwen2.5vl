@@ -138,6 +138,7 @@ def main():
         save_strategy="epoch",
         fp16=True,
         remove_unused_columns=False,
+        max_grad_norm=1.0, # Add gradient clipping
     )
 
     # Trainer for multimodal SFT
