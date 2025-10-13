@@ -14,10 +14,6 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # --- Dependency Layer ---
-# Install uv, a modern, fast Python package installer
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-ENV PATH="/root/.cargo/bin:${PATH}"
-
 # Install Google Cloud SDK for gsutil.
 RUN curl -sSL https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=/usr/local
 ENV PATH="/usr/local/google-cloud-sdk/bin:${PATH}"
@@ -26,7 +22,10 @@ ENV PATH="/usr/local/google-cloud-sdk/bin:${PATH}"
 COPY requirements.txt .
 
 # Install dependencies using uv.
-RUN uv pip install --system --no-cache -r requirements.txt
+# We install and use uv in the same layer, calling it via its absolute path
+# to avoid any PATH issues within the RUN command's shell.
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    /root/.local/bin/uv pip install --system --no-cache -r requirements.txt
 
 # --- Model Cache Layer ---
 # Define build-time argument for model size
