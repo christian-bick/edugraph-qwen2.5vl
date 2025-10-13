@@ -58,8 +58,8 @@ def main():
     # --- Mode-specific Adjustments ---
     if run_mode == "test":
         print("--- Running in TEST mode ---")
-        num_train_epochs = 0.1
-        max_train_samples = 10
+        num_train_epochs = 1
+        max_train_samples = 30
     else:
         print("--- Running in TRAIN mode ---")
         num_train_epochs = stage2_config.num_train_epochs
