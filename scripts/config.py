@@ -20,7 +20,7 @@ class Stage2Config:
             lora_alpha=lora_alpha,
             lora_dropout=lora_dropout,
             bias="none",
-            target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+            target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
             task_type="CAUSAL_LM"
         )
         self.learning_rate = learning_rate
