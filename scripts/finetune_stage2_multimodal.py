@@ -25,7 +25,7 @@ class DataCollatorForQwenVL:
         texts = [feature["text"] for feature in features]
         
         # Explicitly load images from file paths
-        image_paths = [feature["images"] for feature in features]
+        image_paths = [feature["image_path"] for feature in features]
         try:
             images = [Image.open(path) for path in image_paths]
         except Exception as e:
@@ -115,7 +115,7 @@ def main():
     dataset = load_dataset("json", data_files=multimodal_dataset_path, split="train")
     if max_train_samples:
         dataset = dataset.select(range(max_train_samples))
-    dataset = dataset.rename_column("image", "images")
+    dataset = dataset.rename_column("image", "image_path")
 
     # Load the detailed prompt from the file
     with open("prompts/classification_v2.txt", "r") as f:
@@ -123,7 +123,7 @@ def main():
 
     def create_chat_template(examples):
         prompts = []
-        for i in range(len(examples['images'])):
+        for i in range(len(examples['image_path'])):
             chat = [
                 {"role": "system", "content": prompt_text},
                 {"role": "user", "content": [{"type": "image"}]},
