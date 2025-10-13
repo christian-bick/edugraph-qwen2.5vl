@@ -11,9 +11,9 @@ from transformers import (
     BitsAndBytesConfig,
     TrainingArguments,
     Qwen2_5_VLForConditionalGeneration,
+    Trainer,
 )
-from peft import get_peft_model, PeftModel # Import PeftModel
-from trl import SFTTrainer
+from peft import get_peft_model, PeftModel
 from scripts.config import get_config
 
 # --- Custom Data Collator ---
@@ -152,7 +152,7 @@ def main():
     )
 
     # Trainer for multimodal SFT
-    trainer = SFTTrainer(
+    trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=processed_dataset,
