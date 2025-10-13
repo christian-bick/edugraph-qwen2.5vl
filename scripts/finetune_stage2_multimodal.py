@@ -34,6 +34,16 @@ class DataCollatorForQwenVL:
             raise e
         
         batch = self.processor(text=texts, images=images, return_tensors="pt", padding=True)
+
+        # --- DEBUG: Inspect the first image tensor in the batch ---
+        if "pixel_values" in batch and batch["pixel_values"].numel() > 0:
+            first_image_tensor = batch["pixel_values"][0]
+            print(f"[DEBUG IMAGE TENSOR] Shape: {first_image_tensor.shape}, "
+                  f"Min: {first_image_tensor.min():.2f}, "
+                  f"Max: {first_image_tensor.max():.2f}, "
+                  f"Mean: {first_image_tensor.mean():.2f}")
+        # --- END DEBUG ---
+
         batch["labels"] = batch["input_ids"].clone()
         return batch
 
