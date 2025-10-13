@@ -31,7 +31,7 @@ gcloud compute instances create $INSTANCE_NAME \
     --zone=$ZONE \
     --machine-type=g2-standard-8 \
     --boot-disk-size=200GB \
-    --accelerator=type=nvidia-l4,count=2 \
+    --accelerator=type=nvidia-l4,count=1 \
     --image-family=pytorch-2-7-cu128-ubuntu-2204-nvidia-570 \
     --image-project=deeplearning-platform-release \
     --maintenance-policy=TERMINATE \
