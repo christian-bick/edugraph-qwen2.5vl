@@ -24,14 +24,9 @@ class DataCollatorForQwenVL:
     def __call__(self, features: List[Dict[str, Any]]) -> Dict[str, torch.Tensor]:
         texts = [feature["text"] for feature in features]
         
-        # Explicitly load images from file paths
-        image_paths = [feature["image_path"] for feature in features]
-        try:
-            images = [Image.open(path) for path in image_paths]
-        except Exception as e:
-            print(f"Error loading image paths: {image_paths}")
-            print(f"Error: {e}")
-            raise e
+        # The 'image' column from the dataset already contains loaded PIL.Image objects.
+        # We just need to ensure they are in RGB format.
+        images = [feature["image"].convert("RGB") for feature in features]
         
         batch = self.processor(text=texts, images=images, return_tensors="pt", padding=True)
 
@@ -115,7 +110,7 @@ def main():
     dataset = load_dataset("json", data_files=multimodal_dataset_path, split="train")
     if max_train_samples:
         dataset = dataset.select(range(max_train_samples))
-    dataset = dataset.rename_column("image", "image_path")
+    # The 'image' column is automatically decoded by the datasets library
 
     # Load the detailed prompt from the file
     with open("prompts/classification_v2.txt", "r") as f:
@@ -123,7 +118,7 @@ def main():
 
     def create_chat_template(examples):
         prompts = []
-        for i in range(len(examples['image_path'])):
+        for i in range(len(examples['image'])):
             chat = [
                 {"role": "system", "content": prompt_text},
                 {"role": "user", "content": [{"type": "image"}]},
