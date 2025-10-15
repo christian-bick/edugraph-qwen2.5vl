@@ -39,6 +39,15 @@ class DataCollatorForQwenVL:
         batch["labels"] = batch["input_ids"].clone()
         return batch
 
+def compute_metrics(eval_pred):
+    logits, labels = eval_pred
+    predictions = np.argmax(logits, axis=-1)
+    # Ignore padding tokens (-100)
+    mask = labels != -100
+    # Use the evaluate library's accuracy metric
+    return evaluate.load("accuracy").compute(predictions=predictions[mask], references=labels[mask])
+
+
 def main():
     # Load environment variables from .env file for local development
     load_dotenv()
@@ -105,8 +114,16 @@ def main():
 
     # Load and process the dataset
     dataset = load_dataset("json", data_files=multimodal_dataset_path, split="train")
+
+    # Split the dataset into training and evaluation sets (90% train, 10% eval)
+    dataset_split = dataset.train_test_split(test_size=0.1)
+    train_dataset = dataset_split["train"]
+    eval_dataset = dataset_split["test"]
     if max_train_samples:
-        dataset = dataset.select(range(max_train_samples))
+        train_dataset = train_dataset.select(range(max_train_samples))
+        # Also limit the eval set for quick tests, ensuring it's not empty
+        eval_dataset = eval_dataset.select(range(max(1, int(max_train_samples * 0.1))))
+
     # The 'image' column is automatically decoded by the datasets library
 
     # Load the detailed prompt from the file
@@ -124,7 +141,11 @@ def main():
             prompts.append(processor.apply_chat_template(chat, tokenize=False, add_generation_prompt=False))
         return {"text": prompts}
 
-    processed_dataset = dataset.map(create_chat_template, batched=True, remove_columns=["id", "conversations"], num_proc=1)
+    print("Processing training dataset...")
+    processed_train_dataset = train_dataset.map(create_chat_template, batched=True, remove_columns=["id", "conversations"], num_proc=1)
+
+    print("Processing evaluation dataset...")
+    processed_eval_dataset = eval_dataset.map(create_chat_template, batched=True, remove_columns=["id", "conversations"], num_proc=1)
 
     # Instantiate the custom data collator
     data_collator = DataCollatorForQwenVL(processor)
@@ -138,16 +159,19 @@ def main():
         learning_rate=stage2_config.learning_rate, # Use learning rate from config
         logging_steps=10,
         save_strategy="epoch",
+        evaluation_strategy="epoch",
         fp16=True,
         remove_unused_columns=False,
         max_grad_norm=1.0, # Add gradient clipping
     )
 
-    # Trainer for multimodal SFT
+    # Initialize Trainer
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataset=processed_dataset,
+        train_dataset=processed_train_dataset,
+        eval_dataset=processed_eval_dataset,
+        compute_metrics=compute_metrics,
         data_collator=data_collator,
     )
 
