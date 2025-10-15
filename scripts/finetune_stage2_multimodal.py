@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Union
 from PIL import Image
 from dotenv import load_dotenv
+import numpy as np
+import evaluate
 
 from datasets import load_dataset
 from transformers import (
@@ -23,22 +25,17 @@ class DataCollatorForQwenVL:
 
     def __call__(self, features: List[Dict[str, Any]]) -> Dict[str, torch.Tensor]:
         texts = [feature["text"] for feature in features]
-        
-        # The 'image' column from the dataset already contains loaded PIL.Image objects.
-        # We just need to ensure they are in RGB format.
-        images = [feature["image"].convert("RGB") for feature in features]
-        
+        image_paths = [feature["image"] for feature in features]
+
+        try:
+            # Ensure all images are converted to RGB format before processing
+            images = [Image.open(path).convert("RGB") for path in image_paths]
+        except Exception as e:
+            print(f"Error loading image paths: {image_paths}")
+            print(f"Error: {e}")
+            raise e
+
         batch = self.processor(text=texts, images=images, return_tensors="pt", padding=True)
-
-        # --- DEBUG: Inspect the first image tensor in the batch ---
-        if "pixel_values" in batch and batch["pixel_values"].numel() > 0:
-            first_image_tensor = batch["pixel_values"][0]
-            print(f"[DEBUG IMAGE TENSOR] Shape: {first_image_tensor.shape}, "
-                  f"Min: {first_image_tensor.min():.2f}, "
-                  f"Max: {first_image_tensor.max():.2f}, "
-                  f"Mean: {first_image_tensor.mean():.2f}")
-        # --- END DEBUG ---
-
         batch["labels"] = batch["input_ids"].clone()
         return batch
 
