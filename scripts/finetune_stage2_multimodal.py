@@ -159,7 +159,7 @@ def main():
         learning_rate=stage2_config.learning_rate, # Use learning rate from config
         logging_steps=10,
         save_strategy="epoch",
-        evaluation_strategy="epoch",
+        eval_strategy="epoch",
         fp16=True,
         remove_unused_columns=False,
         max_grad_norm=1.0, # Add gradient clipping
