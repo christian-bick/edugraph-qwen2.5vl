@@ -40,7 +40,7 @@ class DataCollatorForQwenVL:
         return batch
 
 def compute_metrics(eval_pred):
-    logits, labels = eval_pred
+    logits, labels = eval_pred.predictions, eval_pred.label_ids
     predictions = np.argmax(logits, axis=-1)
     # Ignore padding tokens (-100)
     mask = labels != -100
