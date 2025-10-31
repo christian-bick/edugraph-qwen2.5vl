@@ -41,6 +41,11 @@ class DataCollatorForQwenVL:
 
 def compute_metrics(eval_pred):
     logits, labels = eval_pred.predictions, eval_pred.label_ids
+
+    # If logits is a tuple, extract the first element
+    if isinstance(logits, tuple):
+        logits = logits[0]
+
     predictions = np.argmax(logits, axis=-1)
     # Ignore padding tokens (-100)
     mask = labels != -100
